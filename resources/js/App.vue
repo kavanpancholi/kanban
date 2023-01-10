@@ -10,6 +10,7 @@ export default {
       updatedCard: null,
       showCreateModal: false,
       deleteCardModal: false,
+      deleteColumnModal: false,
       createCard: {
         column_id: null,
         title: null,
@@ -18,7 +19,10 @@ export default {
       deleteCard: {
         column_id: null,
         card_id: null,
-      }
+      },
+      deleteColumn: {
+        column_id: null,
+      },
     }
   },
   components: {
@@ -60,6 +64,11 @@ export default {
       this.deleteCard.card = card
     },
 
+    triggerDeleteColumn(column, card) {
+      this.deleteColumnModal = true
+      this.deleteColumn.column_id = column
+    },
+
     submitCard() {
       axios.post('/api/columns', this.card).then((res) => {
         const column = this.columns.find((column) => column.id === this.createCard.column_id)
@@ -82,12 +91,20 @@ export default {
     },
 
     confirmDeleteCard() {
-      axios.delete(`/api/columns/${this.deleteCard.column_id}`, {
+      axios.delete(`/api/columns/${this.deleteCard.column_id}/card`, {
         data: {card_id: this.deleteCard.card}
       }).then((res) => {
         const column = this.columns.find((column) => column.id === this.deleteCard.column_id)
         column.cards = column.cards.filter((card) => card.id !== this.deleteCard.card)
         this.deleteCardModal = false
+      })
+    },
+
+    confirmDeleteColumn() {
+      axios.delete(`/api/columns/${this.deleteColumn.column_id}`).then((res) => {
+        const columnIndex = this.columns.findIndex((column) => column.id === this.deleteColumn.column_id)
+        this.columns.splice(columnIndex, 1);
+        this.deleteColumnModal = false
       })
     }
   },
@@ -99,7 +116,7 @@ export default {
   <div
       class="flex flex-col w-screen h-screen overflow-auto text-gray-700 bg-gradient-to-tr from-blue-200 via-indigo-200 to-pink-200">
     <div class="px-10 mt-6">
-      <h1 class="text-2xl font-bold">Team Project Board</h1>
+      <h1 class="text-2xl font-bold">Kanban Board</h1>
     </div>
     <div class="flex flex-grow px-10 mt-4 space-x-6 overflow-auto">
       <div class="flex flex-col flex-shrink-0 w-72" v-for="column in columns">
@@ -109,14 +126,25 @@ export default {
               class="flex items-center justify-center w-5 h-5 ml-2 text-sm font-semibold text-indigo-500 bg-white rounded bg-opacity-30">
             {{ column.cards.length }}
           </span>
-          <button
-              @click="addNewCard(column.id)"
-              class="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-          </button>
+          <div class="flex ml-auto">
+            <button
+                @click="triggerDeleteColumn(column.id)"
+                class="flex items-center justify-center w-6 h-6 mr-3 text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                   stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+              </svg>
+            </button>
+            <button
+                @click="addNewCard(column.id)"
+                class="flex items-center justify-center w-6 h-6 text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="flex flex-col pb-2 overflow-auto">
           <draggable
@@ -148,6 +176,12 @@ export default {
       </div>
       <div class="flex-shrink-0 w-6"></div>
     </div>
+  </div>
+
+  <div class="absolute bottom-4 right-4">
+    <a class="rounded-xl p-3 bg-white" target="_blank" href="/exportdb">
+      Export DB
+    </a>
   </div>
 
   <vue-final-modal
@@ -186,6 +220,22 @@ export default {
       <div class="flex justify-between">
         <button class="py-2 px-4 border border-black" type="button" @click="deleteCardModal = false">Cancel</button>
         <button class="py-2 px-4 border border-black bg-green-300" type="submit" @click="confirmDeleteCard">Confirm</button>
+      </div>
+    </div>
+  </vue-final-modal>
+
+  <vue-final-modal
+      v-model="deleteColumnModal"
+      classes="flex justify-center items-center"
+      content-class="relative md:min-w-[400px] flex flex-col max-h-full mx-4 p-4 border rounded bg-white"
+  >
+    <h2 class="mr-8 text-2xl font-bold mb-5">Delete Column</h2>
+    <div class="flex-grow overflow-y-auto">
+      <h2 class="text-xl mb-5">Are you sure want to delete this column?</h2>
+      <h3 class="text-md mb-5"><strong>Note:</strong> It will remove all the cards inside this column.</h3>
+      <div class="flex justify-between">
+        <button class="py-2 px-4 border border-black" type="button" @click="deleteColumnModal = false">Cancel</button>
+        <button class="py-2 px-4 border border-black bg-green-300" type="submit" @click="confirmDeleteColumn">Confirm</button>
       </div>
     </div>
   </vue-final-modal>

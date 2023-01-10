@@ -65,7 +65,7 @@ class ColumnService
             });
 
             // Delete card from old column
-            $this->delete($cardId, $oldColumnWhereCardWasSaved);
+            $this->deleteCard($cardId, $oldColumnWhereCardWasSaved);
 
             // Add card in new column & sort by custom order
             $newColumnCards = collect($newColumnWhereCardIsSaved->cards)
@@ -111,7 +111,7 @@ class ColumnService
      * @param Column|null $column
      * @return void
      */
-    public function delete(string $cardId, Column $column = null)
+    public function deleteCard(string $cardId, Column $column = null)
     {
         if (!$column) {
             $column = Column::where('cards', 'LIKE', '%'.$cardId.'%')->first();
@@ -123,5 +123,14 @@ class ColumnService
         });
         $column->cards = $oldColumnCards;
         $column->save();
+    }
+
+    /**
+     * @param Column|null $column
+     * @return void
+     */
+    public function delete(Column $column = null): void
+    {
+        $column->delete();
     }
 }

@@ -17,3 +17,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('columns', ColumnController::class);
 Route::post('columns/{card}/reorder', [ColumnController::class, 'reorder']);
+Route::delete('columns/{column}/card', [ColumnController::class, 'destroyCard']);

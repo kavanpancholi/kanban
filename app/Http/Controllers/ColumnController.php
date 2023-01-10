@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CardOrderRequest;
 use App\Http\Requests\CardRequest;
-use App\Http\Requests\ColumnRequest;
 use App\Http\Requests\DeleteCardRequest;
 use App\Http\Resources\ColumnResource;
 use App\Http\Services\ColumnService;
-use App\Models\Card;
 use App\Models\Column;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -60,23 +58,26 @@ class ColumnController extends Controller
     }
 
     /**
-     * @param ColumnRequest $request
-     * @param Column $column
-     * @return ColumnResource
-     */
-    public function update(ColumnRequest $request, Column $column)
-    {
-        return $this->columnService->update($column, $request->validated());
-    }
-
-    /**
      * @param DeleteCardRequest $request
      * @param Column $column
      * @return JsonResponse
      */
-    public function destroy(DeleteCardRequest $request, Column $column)
+    public function destroyCard(DeleteCardRequest $request, Column $column)
     {
-        $this->columnService->delete($request->get('card_id'), $column);
+        $this->columnService->deleteCard($request->get('card_id'), $column);
+
+        return response()->json([
+            'message' => 'Card has been removed successfully'
+        ]);
+    }
+
+    /**
+     * @param Column $column
+     * @return JsonResponse
+     */
+    public function destroy(Column $column)
+    {
+        $this->columnService->delete($column);
 
         return response()->json([
             'message' => 'Column has been removed successfully'
