@@ -10,11 +10,12 @@ class Column extends Model
 {
     use HasFactory;
 
-    /**
-     * @return HasMany
-     */
-    public function cards(): HasMany
-    {
-        return $this->hasMany(Card::class);
-    }
+    protected $fillable = [
+        'title',
+        'cards',
+    ];
+
+    protected $casts = [
+        'cards' => 'array'
+    ];
 }

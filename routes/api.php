@@ -15,5 +15,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('cards', CardController::class);
 Route::resource('columns', ColumnController::class);
+Route::post('columns/{card}/reorder', [ColumnController::class, 'reorder']);

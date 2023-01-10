@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CardOrderRequest;
 use App\Http\Requests\ColumnRequest;
 use App\Http\Resources\ColumnResource;
 use App\Http\Services\ColumnService;
+use App\Models\Card;
 use App\Models\Column;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -39,6 +41,11 @@ class ColumnController extends Controller
     public function store(ColumnRequest $request)
     {
         return $this->columnService->create($request->validated());
+    }
+
+    public function reorder(CardOrderRequest $request, string $cardId)
+    {
+        $this->columnService->reorder($cardId, $request->validated());
     }
 
     /**
