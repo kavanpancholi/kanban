@@ -5,10 +5,13 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Column>
+ * @extends Factory<\App\Models\Column>
  */
 class ColumnFactory extends Factory
 {
+    private static array $titleArray = ['Backlog', 'Ready', 'Doing', 'Review', 'Blocked', 'Done'];
+    private static int $order = 0;
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +20,7 @@ class ColumnFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->word,
+            'title' => self::$titleArray[self::$order++],
         ];
     }
 }

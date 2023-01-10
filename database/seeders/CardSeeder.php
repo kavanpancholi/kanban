@@ -16,9 +16,9 @@ class CardSeeder extends Seeder
      */
     public function run()
     {
-        Card::factory()
-            ->count(5)
-            ->has(Column::factory()->count(7))
+        Column::factory()
+            ->count(6)
+            ->has(Card::factory()->count(rand(3, 9)))
             ->create();
     }
 }
