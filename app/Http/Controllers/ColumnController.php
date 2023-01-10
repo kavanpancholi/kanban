@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CardOrderRequest;
+use App\Http\Requests\CardRequest;
 use App\Http\Requests\ColumnRequest;
+use App\Http\Requests\DeleteCardRequest;
 use App\Http\Resources\ColumnResource;
 use App\Http\Services\ColumnService;
 use App\Models\Card;
@@ -35,10 +37,10 @@ class ColumnController extends Controller
     }
 
     /**
-     * @param ColumnRequest $request
+     * @param CardRequest $request
      * @return ColumnResource
      */
-    public function store(ColumnRequest $request)
+    public function store(CardRequest $request)
     {
         return $this->columnService->create($request->validated());
     }
@@ -68,12 +70,13 @@ class ColumnController extends Controller
     }
 
     /**
+     * @param DeleteCardRequest $request
      * @param Column $column
      * @return JsonResponse
      */
-    public function destroy(Column $column)
+    public function destroy(DeleteCardRequest $request, Column $column)
     {
-        $this->columnService->delete($column);
+        $this->columnService->delete($request->get('card_id'), $column);
 
         return response()->json([
             'message' => 'Column has been removed successfully'

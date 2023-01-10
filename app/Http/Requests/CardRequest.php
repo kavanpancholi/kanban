@@ -26,7 +26,6 @@ class CardRequest extends FormRequest
         return [
             'title' => ['required', 'string'],
             'description' => ['nullable', 'string'],
-            'order' => ['required', 'integer'],
             'column_id' => ['required', 'exists:columns,id'],
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Http\Resources\ColumnResource;
 use App\Models\Column;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Str;
 
 class ColumnService
 {
@@ -20,15 +21,24 @@ class ColumnService
 
     /**
      * @param $data
-     * @return ColumnResource
+     * @return array
      */
-    public function create($data): ColumnResource
+    public function create($data)
     {
-        $column = new Column();
-        $column->fill($data);
+        $column = Column::find($data['column_id']);
+
+        $card = [
+            'id' => Str::uuid(),
+            'title' => $data['title'],
+            'description' => $data['description'],
+        ];
+
+        $column->cards = collect($column->cards)
+            ->push($card)->values();
+
         $column->save();
 
-        return ColumnResource::make($column);
+        return $card;
     }
 
     /**
@@ -99,9 +109,9 @@ class ColumnService
     /**
      * @param string $cardId
      * @param Column|null $column
-     * @return bool
+     * @return void
      */
-    public function delete(string $cardId, Column $column = null): bool
+    public function delete(string $cardId, Column $column = null)
     {
         if (!$column) {
             $column = Column::where('cards', 'LIKE', '%'.$cardId.'%')->first();
