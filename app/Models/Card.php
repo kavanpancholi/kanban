@@ -10,6 +10,13 @@ class Card extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'description',
+        'order',
+        'column_id',
+    ];
+
     /**
      * @return BelongsTo
      */
