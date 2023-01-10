@@ -15,7 +15,7 @@ class ExportController extends Controller
             ->dumpToFile('dump.sql');
 
         return response()
-            ->download(storage_path('dump.sql'), 'dump.sql')
+            ->download(public_path('dump.sql'), 'dump.sql')
             ->deleteFileAfterSend();
     }
 }
